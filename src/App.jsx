@@ -10,7 +10,8 @@ function App() {
         <BrowserRouterHook>
             <Switch>
                 <Route exact path="/meeting/:name" component={Meeting}></Route>
-                <Route path="/" component={Index}></Route>
+                <Route exact path="/host" component={Index}></Route>
+                <Route exact path="/" component={Index}></Route>
             </Switch>
         </BrowserRouterHook>
     )

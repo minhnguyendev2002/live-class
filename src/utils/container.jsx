@@ -121,7 +121,7 @@ export const ContainerProvider = ({children}) => {
             JSON.stringify({
                 uid: state.config.uid,
                 host: state.config.host,
-                channelName: state.config.channelName,
+                channelName: 'kanes',
                 token: state.config.token,
                 resolution: state.config.resolution
             })

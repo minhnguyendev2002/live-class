@@ -80,7 +80,7 @@ const MeetingPage = () => {
     const config = useMemo(() => {
         return {
             token: stateCtx.config.token,
-            channel: stateCtx.config.channelName,
+            channel: 'kanes',
             microphoneId: stateCtx.config.microphoneId,
             cameraId: stateCtx.config.cameraId,
             uid: stateCtx.config.uid,
@@ -187,12 +187,14 @@ const MeetingPage = () => {
 
     return (
         <div className="meeting">
+            <div className='side-bar'>
+                
+            </div>
             <div className="current-view">
                 <div className="nav">
                     <div className="avatar-container">
-                        <div className="default-avatar"></div>
-                        <div className="avatar-text">Agora Test</div>
-                        <div className="like"></div>
+                        2009
+                        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                     </div>
                     <Tooltip title="quit">
                         <div
@@ -201,6 +203,7 @@ const MeetingPage = () => {
                         ></div>
                     </Tooltip>
                 </div>
+                {/* <div className='box-video'> */}
                 <StreamPlayer
                     uid={config.uid}
                     isLocal={true}

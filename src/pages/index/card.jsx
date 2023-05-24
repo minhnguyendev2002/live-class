@@ -24,7 +24,9 @@ const useStyles = makeStyles(theme => ({
         alignItems: 'center',
         flex: 1,
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        padding: '0 0 15px 0',
+        borderRadius: '10px',
     },
     coverContent: {
         display: 'flex',
@@ -46,9 +48,8 @@ const useStyles = makeStyles(theme => ({
     card: {
         display: 'flex',
         minWidth: 700,
-        minHeight: 500,
-        maxHeight: 500,
         borderRadius: '10px',
+        padding: '10px',
         boxShadow: '0px 6px 18px 0px rgba(0,0,0,0.2)'
     },
     input: {
@@ -88,10 +89,10 @@ export default function CardPage() {
                                 <Box textAlign="center" fontSize="h6.fontSize" className={classes.fontStyle}>Welcome
                                     to</Box>
                                 <Box textAlign="center" fontWeight="fontWeightRegular" fontSize="h4.fontSize"
-                                     className={classes.midItem}>OPEN LIVE</Box>
+                                     className={classes.midItem}>WEALTH MANAGEMENT</Box>
                                 {/* <Box textAlign="center" fontWeight="fontWeightRegular" className={classes.fontStyle} style={{color: "white", fontSize: "17px"}}>Agora Web SDK: {AgoraRTC.VERSION}</Box> */}
                                 <Box textAlign="center" fontWeight="fontWeightRegular" className={classes.fontStyle}
-                                     fontSize="h7.fontSize">Powered by Agora.io</Box>
+                                     fontSize="h7.fontSize">Powered by GENSI</Box>
                             </div>
                         </div>
                     </div>

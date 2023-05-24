@@ -19,7 +19,7 @@ const defaultState = {
     config: {
         uid: 0,
         host: true,
-        channelName: '',
+        channelName: 'kanes',
         token: process.env.REACT_APP_AGORA_APP_TOKEN,
         resolution: '480p',
         ...readDefaultState(),

@@ -94,7 +94,8 @@ body {
 
 .current-view {
     display: flex;
-    flex: 1;
+    width: 70vw;
+    height: 65vh;
     position: relative;
     background-repeat: no-repeat;
     background-position: center;
@@ -537,4 +538,14 @@ body {
     display: flex;
     flex-direction: column;
     position: absolute;
+}
+.box-video {
+    width: 70vw;
+    border-radius: 12px;
+    height: 80vh;
+}
+.side-bar {
+    width: 80px;
+    height: 100vh;
+    background-color: #666;
 }

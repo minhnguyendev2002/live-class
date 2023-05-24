@@ -1,51 +1,11 @@
 import React from 'react'
-import clsx from 'clsx'
-import {makeStyles, withStyles} from '@material-ui/core/styles'
-import {useGlobalState, useGlobalMutation} from '../../utils/container'
+import {makeStyles } from '@material-ui/core/styles'
+import {useGlobalMutation} from '../../utils/container'
 import FormControl from '@material-ui/core/FormControl'
-import InputLabel from '@material-ui/core/InputLabel'
-import Input from '@material-ui/core/Input'
 import Box from '@material-ui/core/Box'
 import Button from '@material-ui/core/Button'
 import useRouter from '../../utils/use-router'
-import {Link} from 'react-router-dom'
-
-const CustomRadio = withStyles({
-    root: {
-        color: '#999999',
-        '&$checked': {
-            color: '#44A2FC'
-        },
-        '&:hover': {
-            backgroundColor: 'inherit'
-        }
-    }
-})(({children, ...props}) => {
-    return (
-        <div className={`role-item ${props.checked ? 'active' : 'inactive'}`} onClick={(evt) => {
-            props.onClick(props)
-        }}>
-            <div className={`icon-${props.value}`}></div>
-            <div className={`radio-row ${props.value}`}>
-                <div className="custom-radio">
-                    <input
-                        readOnly
-                        type="radio"
-                        value={props.value}
-                        checked={props.checked}
-                    />
-                    <div className="checkmark"></div>
-                </div>
-                <Box
-                    flex="1"
-                    className={`role-name ${props.checked ? 'active' : 'inactive'}`}
-                >
-                    {props.value}
-                </Box>
-            </div>
-        </div>
-    )
-})
+import {Link } from 'react-router-dom'
 
 const useStyles = makeStyles((theme) => ({
     fontStyle: {
@@ -122,32 +82,17 @@ export default function IndexCard() {
     const classes = useStyles()
 
     const routerCtx = useRouter()
-    const stateCtx = useGlobalState()
     const mutationCtx = useGlobalMutation()
 
     const handleClick = () => {
-        if (!stateCtx.config.channelName) {
-            mutationCtx.toastError('You need enter the channel name')
-            return
-        }
-
         mutationCtx.startLoading()
         routerCtx.history.push({
-            pathname: `/meeting/${stateCtx.config.channelName}`
-        })
-    }
-
-    const handleChange = (evt) => {
-        const {value } = evt
-        console.log('value', evt)
-        mutationCtx.updateConfig({
-            host: value === 'host'
+            pathname: `/meeting/wealmanagement`
         })
     }
 
     return (
         <Box
-            marginTop="114px"
             flex="1"
             display="flex"
             alignItems="center"
@@ -157,21 +102,9 @@ export default function IndexCard() {
             <Link to="/setting" className="setting-btn"/>
             
             <span className="version">
-                Web SDK Version: 
+                Wealth Management
             </span>
             <div className="role-container">
-                <CustomRadio
-                    className={classes.radio}
-                    value="host"
-                    checked={stateCtx.config.host}
-                    onClick={handleChange}
-                ></CustomRadio>
-                <CustomRadio
-                    className={classes.radio}
-                    value="audience"
-                    checked={!stateCtx.config.host}
-                    onClick={handleChange}
-                ></CustomRadio>
             </div>
             <Box
                 marginTop="92"
@@ -181,23 +114,6 @@ export default function IndexCard() {
                 justifyContent="center"
                 flexDirection="column"
             >
-                <FormControl className={clsx(classes.input, classes.grid)}>
-                    <InputLabel htmlFor="channelName">Enter a channel name</InputLabel>
-                    <Input
-                        id="channelName"
-                        name="channelName"
-                        value={stateCtx.config.channelName}
-                        onChange={(evt) => {
-                            const PATTERN = /^[a-zA-Z0-9!#$%&()+\-:;<=.>?@[\]^_{}|~,\s]{1,64}$/
-                            const value = PATTERN.test(evt.target.value)
-                            if (value && evt.target.value.length < 64) {
-                                mutationCtx.updateConfig({channelName: evt.target.value})
-                            } else {
-                                mutationCtx.updateConfig({channelName: ''})
-                            }
-                        }}
-                    />
-                </FormControl>
                 <FormControl className={classes.grid}>
                     <Button
                         onClick={handleClick}
@@ -205,7 +121,7 @@ export default function IndexCard() {
                         color="primary"
                         className={classes.button}
                     >
-                        Start Live Streaming
+                        {window.location.href.includes('/host') ? 'Start' : 'Join'} Live Streaming
                     </Button>
                 </FormControl>
             </Box>

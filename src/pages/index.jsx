@@ -29,7 +29,7 @@ const Index = () => {
 
     return (
         <Container maxWidth="sm" className={classes.container}>
-            <IndexCard/>
+            <IndexCard />
         </Container>
     )
 }
