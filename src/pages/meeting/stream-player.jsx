@@ -10,32 +10,36 @@ export default function StreamPlayer(props) {
 
     useMemo(() => {
         if (videoTrack != null) {
-            if (muteVideo == true) {
+            if (muteVideo === true) {
                 videoTrack.stop()
-            } else if (muteVideo == false) {
+            } else if (muteVideo === false) {
                 videoTrack.play(`stream-player-${uid}`)
             }
         }
+        //eslint-disable-next-line
     }, [muteVideo, videoTrack])
 
     useMemo(() => {
         if (videoTrack != null) {
-            if (muteAudio == true) {
+            if (muteAudio === true) {
                 audioTrack.stop()
-            } else if (muteAudio == false) {
+            } else if (muteAudio === false) {
                 audioTrack.play()
             }
         }
+        //eslint-disable-next-line
     }, [muteAudio, audioTrack])
 
     useEffect(() => {
         if (videoTrack != null) {
-            if (muteVideo == true) {
+            if (muteVideo === true) {
                 videoTrack.stop()
-            } else if (muteVideo == false) {
+            } else if (muteVideo === false) {
                 videoTrack.play(`stream-player-${uid}`)
             }
         }
+        
+        //eslint-disable-next-line
     }, [muteVideo, videoTrack])
 
     const [state, setState] = useState({

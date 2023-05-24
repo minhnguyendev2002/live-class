@@ -9,7 +9,6 @@ import Box from '@material-ui/core/Box'
 import Button from '@material-ui/core/Button'
 import useRouter from '../../utils/use-router'
 import {Link} from 'react-router-dom'
-import AgoraRTC from 'agora-rtc-sdk-ng'
 
 const CustomRadio = withStyles({
     root: {
@@ -139,7 +138,7 @@ export default function IndexCard() {
     }
 
     const handleChange = (evt) => {
-        const {value, checked} = evt
+        const {value } = evt
         console.log('value', evt)
         mutationCtx.updateConfig({
             host: value === 'host'
@@ -156,11 +155,10 @@ export default function IndexCard() {
             flexDirection="column"
         >
             <Link to="/setting" className="setting-btn"/>
-            <span className="version">Web SDK Version: {AgoraRTC.VERSION}</span>
-            <a
-                href="https://github.com/AgoraIO/Basic-Video-Broadcasting/tree/master/OpenLive-Web"
-                className="github"
-            ></a>
+            
+            <span className="version">
+                Web SDK Version: 
+            </span>
             <div className="role-container">
                 <CustomRadio
                     className={classes.radio}

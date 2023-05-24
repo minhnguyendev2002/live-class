@@ -1,7 +1,5 @@
 import React, {useEffect, useState, useMemo} from 'react'
-import clsx from 'clsx'
 import {useGlobalState, useGlobalMutation} from '../utils/container'
-import {makeStyles} from '@material-ui/core/styles'
 import useRouter from '../utils/use-router'
 import RTCClient from '../rtc-client'
 import Tooltip from '@material-ui/core/Tooltip'
@@ -59,6 +57,7 @@ const MeetingPage = () => {
         client.on('user-unpublished', onUserUnPublished)
 
         return client
+        //eslint-disable-next-line
     }, [stateCtx.codec, stateCtx.mode])
 
     const [muteVideo, setMuteVideo] = useState(stateCtx.muteVideo)
@@ -87,6 +86,7 @@ const MeetingPage = () => {
             uid: stateCtx.config.uid,
             host: stateCtx.config.host
         }
+        //eslint-disable-next-line
     }, [stateCtx, muteVideo, muteAudio])
 
     const history = routerCtx.history
@@ -104,8 +104,8 @@ const MeetingPage = () => {
         if (
             config.channel &&
             localClient._created &&
-            localClient._joined == false &&
-            localClient._leave == false
+            localClient._joined === false &&
+            localClient._leave === false
         ) {
             localClient.setClientRole(config.host ? 'host' : 'audience')
             localClient.join(config.channel, config.token)

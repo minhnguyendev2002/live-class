@@ -185,7 +185,7 @@ export default class RTCClient {
 
     join(channel, token) {
         return new Promise((resolve, reject) => {
-            if (this._joined == true) {
+            if (this._joined === true) {
                 resolve(this._uid)
                 return
             }
@@ -215,7 +215,7 @@ export default class RTCClient {
 
     leave() {
         return new Promise((resolve) => {
-            if (this._leave == true) {
+            if (this._leave === true) {
                 resolve()
                 return
             }
