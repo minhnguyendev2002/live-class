@@ -106,6 +106,7 @@ const MeetingPage = () => {
       localClient._leave === false
     ) {
       localClient.setClientRole(config.host ? "host" : "audience");
+      console.log('=======================', config.host)
       localClient
         .join(config.channel, config.token)
         .then((uid) => {
