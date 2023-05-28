@@ -18,6 +18,7 @@ export default class RTCClient {
         this._uid = 0
         this._eventBus = new EventEmitter()
         this._created = false
+        this._isStream = false
     }
 
     createClient(data) {

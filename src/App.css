@@ -549,3 +549,37 @@ body {
     height: 100vh;
     background-color: #666;
 }
+
+
+.custom-scroll-element::-webkit-scrollbar-track
+{
+    border-radius: 10px;
+    background-color: transparent;
+}
+
+.custom-scroll-element::-webkit-scrollbar
+{
+    width: 10px;
+    background-color: transparent;
+}
+
+.custom-scroll-element::-webkit-scrollbar-thumb
+{
+    border-radius: 10px;
+    background-color: #ced2db;
+    @apply  transition-all duration-300;
+}
+
+.custom-scroll-element::-webkit-scrollbar-thumb:hover{
+    background-color: #bfc2ca;
+}
+
+.ant-slider {
+    margin: 0px !important;
+}
+.ant-slider-track{
+    background-color: #00a389 !important;
+}
+.ant-slider-handle {
+    border-color: white !important;
+}
