@@ -12,6 +12,39 @@ const MeetingPage = () => {
   const stateCtx = useGlobalState();
   const mutationCtx = useGlobalMutation();
 
+  const [startTime, setStartTime] = useState(null);
+  const [elapsedTime, setElapsedTime] = useState(0);
+
+  useEffect(() => {
+    // Cập nhật thời gian đếm sau mỗi giây
+    const timer = setInterval(() => {
+      if (startTime) {
+        const currentTime = new Date();
+        const elapsed = Math.round((currentTime - startTime) / 1000);
+        setElapsedTime(elapsed);
+      }
+    }, 1000);
+
+    // Xóa timer khi component bị unmount hoặc khi kết thúc livestream
+    return () => {
+      clearInterval(timer);
+    };
+  }, [startTime]);
+
+  const formatTime = (time) => {
+    const hours = Math.floor(time / 3600);
+    const minutes = Math.floor((time % 3600) / 60);
+    const seconds = time % 60;
+
+    return hours
+      ? `${hours.toString().padStart(2, "0")}:${minutes
+          .toString()
+          .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
+      : `${minutes.toString().padStart(2, "0")}:${seconds
+          .toString()
+          .padStart(2, "0")}`;
+  };
+
   const onUserPublished = (remoteUser, mediaType) => {
     // remoteUser:
     // mediaType: "audio" | "video" | "all"
@@ -20,6 +53,7 @@ const MeetingPage = () => {
       .subscribe(remoteUser, mediaType)
       .then((mRemoteTrack) => {
         addRemoteUser(remoteUser);
+        console.log('==================================================sub', remoteUser)
       })
       .catch((err) => {
         mutationCtx.toastError(
@@ -78,7 +112,7 @@ const MeetingPage = () => {
   const config = useMemo(() => {
     return {
       token: stateCtx.config.token,
-      channel: "kanes",
+      channel: `${process.env.REACT_APP_AGORA_APP_CHANNEL}`,
       microphoneId: stateCtx.config.microphoneId,
       cameraId: stateCtx.config.cameraId,
       uid: stateCtx.config.uid,
@@ -105,14 +139,14 @@ const MeetingPage = () => {
       localClient._joined === false &&
       localClient._leave === false
     ) {
-      localClient.setClientRole(config.host ? "host" : "audience");
-      console.log('=======================', config.host)
+      localClient.setClientRole(config.host === "host" ? "host" : "audience");
+      console.log("=======================", config.host);
       localClient
         .join(config.channel, config.token)
         .then((uid) => {
           config.uid = uid;
 
-          if (config.host) {
+          if (config.host === "host") {
             localClient
               .startLive(config.microphoneId, config.cameraId)
               .then(() => {
@@ -306,7 +340,7 @@ const MeetingPage = () => {
                           <i className="text-danger-100 text-[5px] fas fa-circle" />
                         </span>
                         <span className="text-white font-semibold text-xl">
-                          03:06:36s
+                          {formatTime(elapsedTime)}
                         </span>
                       </div>
                     </div>
@@ -327,7 +361,7 @@ const MeetingPage = () => {
                         showInfo={stateCtx.profile}
                         rtcClient={localClient._client}
                       >
-                        {config.host ? (
+                        {config.host === 'host' ? (
                           <StreamMenu
                             muteAudio={muteAudio}
                             muteVideo={muteVideo}

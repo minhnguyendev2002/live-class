@@ -122,7 +122,7 @@ export const ContainerProvider = ({ children }) => {
       JSON.stringify({
         uid: state.config.uid,
         host: state.config.host,
-        channelName: "kanes",
+        channelName: `${process.env.REACT_APP_AGORA_APP_CHANNEL}`,
         token: state.config.token,
         resolution: state.config.resolution,
       })
