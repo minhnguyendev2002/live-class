@@ -3,7 +3,6 @@ import { useGlobalState, useGlobalMutation } from "../utils/container";
 import useRouter from "../utils/use-router";
 import RTCClient from "../rtc-client";
 import StreamPlayer from "./meeting/stream-player";
-import StreamMenu from "./meeting/stream-menu";
 import ChatPopup from "../components/ChatPopup";
 import Loading from "../utils/loading";
 import {
@@ -25,44 +24,22 @@ const Audience = () => {
     localClient
       .subscribe(remoteUser, mediaType)
       .then((mRemoteTrack) => {
-        setVideoTrack(remoteUser.videoTrack);
-        setAudioTrack(remoteUser.audioTrack);
+        if (mediaType === "video" || mediaType === "all") {
+          setVideoTrack(remoteUser._videoTrack);
+          setAudioTrack(remoteUser._audioTrack);
+        }
       })
       .catch((err) => {
         mutationCtx.toastError(
           `stream ${remoteUser.getId()} subscribe failed: ${err}`
         );
       });
-    if (mediaType === "video" || mediaType === "all") {
-    }
   };
 
   const onUserUnpublished = (remoteUser, mediaType) => {
-    // localClient
-    //   .subscribe(remoteUser, mediaType)
-    //   .then((mRemoteTrack) => {})
-    //   .catch((err) => {
-    //     mutationCtx.toastError(
-    //       `stream ${remoteUser.getId()} subscribe failed: ${err}`
-    //     );
-    //   });
-    // if (mediaType === "video" || mediaType === "all") {
-    //   // Ẩn luồng video của host
-    //   videoRef.current.srcObject = null;
-    // }
+    if (mediaType === "video" || mediaType === "all") {
+    }
   };
-
-  useEffect(() => {
-    // Đăng ký sự kiện khi host xuất bản hoặc ngừng xuất bản luồng truyền
-    localClient.on("user-published", onUserPublished);
-    localClient.on("user-unpublished", onUserUnpublished);
-
-    // Hủy đăng ký khi component bị unmount
-    return () => {
-      //   localClient.off("user-published", onUserPublished);
-      //   localClient.off("user-unpublished", onUserUnpublished);
-    };
-  }, []);
 
   const config = useMemo(() => {
     return {
@@ -80,7 +57,8 @@ const Audience = () => {
     const client = new RTCClient();
     client.createClient({ codec: stateCtx.codec, mode: stateCtx.mode });
 
-    client.on("connection-state-change", mutationCtx.connectionStateChanged);
+    client.on("user-published", onUserPublished);
+    client.on("user-unpublished", onUserUnpublished);
 
     return client;
     //eslint-disable-next-line
@@ -93,11 +71,12 @@ const Audience = () => {
       localClient._joined === false &&
       localClient._leave === false
     ) {
-      localClient.setClientRole(config.host === "host" ? "host" : "audience");
+      localClient.setClientRole("audience");
       localClient
         .join(config.channel, config.token)
         .then((uid) => {
           config.uid = uid;
+          // this.onUserPublished();
           mutationCtx.stopLoading();
         })
         .catch(async (err) => {
@@ -106,6 +85,20 @@ const Audience = () => {
         });
     }
   }, [localClient, mutationCtx, config, routerCtx]);
+
+  // useEffect(() => {
+  //   let timer1 = setTimeout(() => {
+  //     localClient.on("user-published", (user, mediaType) => {
+  //       onUserPublished()
+  //     });
+  //   }, 1000);
+
+
+  //   return () => {
+  //     clearTimeout(timer1);
+  //   };
+
+  // }, [localClient]);
 
   return (
     <div className="flex w-full">

@@ -85,8 +85,8 @@ export default function IndexCard() {
     username: "wealth-admin",
     password: "vip123",
   });
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("wealth-admin");
+  const [password, setPassword] = useState("vip123");
 
   const routerCtx = useRouter();
   const mutationCtx = useGlobalMutation();

@@ -14,12 +14,14 @@ export default function StreamPlayer(props) {
                 videoTrack.stop()
             } else if (muteVideo === false) {
                 videoTrack.play(`stream-player-${uid}`)
+                console.log('====================================', 'Play video Memo')
             }
         }
         //eslint-disable-next-line
     }, [muteVideo, videoTrack])
 
     useMemo(() => {
+        console.log('.............................................', audioTrack)
         if (videoTrack != null) {
             if (muteAudio === true) {
                 audioTrack.stop()
@@ -36,9 +38,17 @@ export default function StreamPlayer(props) {
                 videoTrack.stop()
             } else if (muteVideo === false) {
                 videoTrack.play(`stream-player-${uid}`)
+                console.log('====================================', 'paly video efect')
             }
         }
-        
+        // if (videoTrack != null) {
+        //     if (muteAudio === true) {
+        //         audioTrack.stop()
+        //     } else if (muteAudio === false) {
+        //         audioTrack.play()
+        //         console.log('====================================', )
+        //     }
+        // }
         //eslint-disable-next-line
     }, [muteVideo, videoTrack])
 

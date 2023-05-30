@@ -52,49 +52,11 @@ const MeetingPage = () => {
           .padStart(2, "0")}`;
   };
 
-  const onUserPublished = (remoteUser, mediaType) => {
-    // remoteUser:
-    // mediaType: "audio" | "video" | "all"
-    console.debug(`onUserPublished ${remoteUser.uid}, mediaType= ${mediaType}`);
-    localClient
-      .subscribe(remoteUser, mediaType)
-      .then((mRemoteTrack) => {
-        addRemoteUser(remoteUser);
-        // setVideoTrack(localClient.mLocalVideoTrack);
-        // setAudioTrack(localClient.mLocalAudioTrack);
-      })
-      .catch((err) => {
-        mutationCtx.toastError(
-          `stream ${remoteUser.getId()} subscribe failed: ${err}`
-        );
-      });
-
-    if (mediaType === "video" || mediaType === "all") {
-    }
-
-    if (mediaType === "audio" || mediaType === "all") {
-    }
-  };
-
-  const onUserUnPublished = (remoteUser, mediaType) => {
-    // remoteUser:
-    // mediaType: "audio" | "video" | "all"
-    console.debug(`onUserUnPublished ${remoteUser.uid}`);
-    removeRemoteUser(remoteUser);
-    if (mediaType === "video" || mediaType === "all") {
-    }
-
-    if (mediaType === "audio" || mediaType === "all") {
-    }
-  };
-
   const localClient = useMemo(() => {
     const client = new RTCClient();
     client.createClient({ codec: stateCtx.codec, mode: stateCtx.mode });
 
     client.on("connection-state-change", mutationCtx.connectionStateChanged);
-    client.on("user-published", onUserPublished);
-    client.on("user-unpublished", onUserUnPublished);
 
     return client;
     //eslint-disable-next-line
@@ -106,16 +68,6 @@ const MeetingPage = () => {
   const [VideoTrack, setVideoTrack] = useState(null);
   const [AudioTrack, setAudioTrack] = useState(null);
   const [remoteUsers, setRemoteUsers] = useState({});
-
-  const addRemoteUser = (remoteUser) => {
-    remoteUsers[remoteUser.uid] = remoteUser;
-    setRemoteUsers(remoteUsers);
-  };
-
-  const removeRemoteUser = (remoteUser) => {
-    delete remoteUsers[remoteUser.uid];
-    setRemoteUsers(remoteUsers);
-  };
 
   const config = useMemo(() => {
     return {
@@ -159,7 +111,7 @@ const MeetingPage = () => {
               .then(async () => {
                 setVideoTrack(localClient.mLocalVideoTrack);
                 setAudioTrack(localClient.mLocalAudioTrack);
-                await updateCurrentLive({ uid: config.uid });
+                console.log('===============================================', localClient)
               });
           }
           mutationCtx.stopLoading();
@@ -167,18 +119,9 @@ const MeetingPage = () => {
         .catch(async (err) => {
           await mutationCtx.toastError(`join error: ${err.info}`);
           routerCtx.history.push("/");
-          console.log("===============================", `${err.info}`);
         });
     }
   }, [localClient, mutationCtx, config, routerCtx]);
-
-  useEffect(async () => {
-    if (config.host && config.host !== "host") {
-      const currentStream = await getCurrentLive();
-      console.log(currentStream)
-      setcurrentStream(currentStream.data?.live?.currentLive);
-    }
-  }, []);
 
   const toggleVideo = () => {
     const newValue = !muteVideo;
@@ -230,8 +173,8 @@ const MeetingPage = () => {
   };
 
   const doLeave = () => {
-    localClient.stopLive();
     localClient.destroy();
+    localClient.stopLive();
     routerCtx.history.push("/");
   };
 
