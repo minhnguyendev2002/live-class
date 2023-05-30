@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import { useGlobalState, useGlobalMutation } from "../utils/container";
 import useRouter from "../utils/use-router";
 import RTCClient from "../rtc-client";
@@ -12,110 +12,57 @@ import {
   getCurrentLive,
 } from "../utils/services";
 
-const MeetingPage = () => {
+const Audience = () => {
   const routerCtx = useRouter();
   const stateCtx = useGlobalState();
   const mutationCtx = useGlobalMutation();
-
-  const [startTime, setStartTime] = useState(null);
-  const [elapsedTime, setElapsedTime] = useState(0);
-
-  const [currentStream, setcurrentStream] = useState(0);
-
-  useEffect(() => {
-    // Cập nhật thời gian đếm sau mỗi giây
-    const timer = setInterval(() => {
-      if (startTime) {
-        const currentTime = new Date();
-        const elapsed = Math.round((currentTime - startTime) / 1000);
-        setElapsedTime(elapsed);
-      }
-    }, 1000);
-
-    // Xóa timer khi component bị unmount hoặc khi kết thúc livestream
-    return () => {
-      clearInterval(timer);
-    };
-  }, [startTime]);
-
-  const formatTime = (time) => {
-    const hours = Math.floor(time / 3600);
-    const minutes = Math.floor((time % 3600) / 60);
-    const seconds = time % 60;
-
-    return hours
-      ? `${hours.toString().padStart(2, "0")}:${minutes
-          .toString()
-          .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
-      : `${minutes.toString().padStart(2, "0")}:${seconds
-          .toString()
-          .padStart(2, "0")}`;
-  };
+  const [muteVideo, setMuteVideo] = useState(stateCtx.muteVideo);
+  const [muteAudio, setMuteAudio] = useState(stateCtx.muteAudio);
+  const [VideoTrack, setVideoTrack] = useState(null);
+  const [AudioTrack, setAudioTrack] = useState(null);
 
   const onUserPublished = (remoteUser, mediaType) => {
-    // remoteUser:
-    // mediaType: "audio" | "video" | "all"
-    console.debug(`onUserPublished ${remoteUser.uid}, mediaType= ${mediaType}`);
     localClient
       .subscribe(remoteUser, mediaType)
       .then((mRemoteTrack) => {
-        addRemoteUser(remoteUser);
-        // setVideoTrack(localClient.mLocalVideoTrack);
-        // setAudioTrack(localClient.mLocalAudioTrack);
+        setVideoTrack(remoteUser.videoTrack);
+        setAudioTrack(remoteUser.audioTrack);
       })
       .catch((err) => {
         mutationCtx.toastError(
           `stream ${remoteUser.getId()} subscribe failed: ${err}`
         );
       });
-
     if (mediaType === "video" || mediaType === "all") {
     }
-
-    if (mediaType === "audio" || mediaType === "all") {
-    }
   };
 
-  const onUserUnPublished = (remoteUser, mediaType) => {
-    // remoteUser:
-    // mediaType: "audio" | "video" | "all"
-    console.debug(`onUserUnPublished ${remoteUser.uid}`);
-    removeRemoteUser(remoteUser);
-    if (mediaType === "video" || mediaType === "all") {
-    }
-
-    if (mediaType === "audio" || mediaType === "all") {
-    }
+  const onUserUnpublished = (remoteUser, mediaType) => {
+    // localClient
+    //   .subscribe(remoteUser, mediaType)
+    //   .then((mRemoteTrack) => {})
+    //   .catch((err) => {
+    //     mutationCtx.toastError(
+    //       `stream ${remoteUser.getId()} subscribe failed: ${err}`
+    //     );
+    //   });
+    // if (mediaType === "video" || mediaType === "all") {
+    //   // Ẩn luồng video của host
+    //   videoRef.current.srcObject = null;
+    // }
   };
 
-  const localClient = useMemo(() => {
-    const client = new RTCClient();
-    client.createClient({ codec: stateCtx.codec, mode: stateCtx.mode });
+  useEffect(() => {
+    // Đăng ký sự kiện khi host xuất bản hoặc ngừng xuất bản luồng truyền
+    localClient.on("user-published", onUserPublished);
+    localClient.on("user-unpublished", onUserUnpublished);
 
-    client.on("connection-state-change", mutationCtx.connectionStateChanged);
-    client.on("user-published", onUserPublished);
-    client.on("user-unpublished", onUserUnPublished);
-
-    return client;
-    //eslint-disable-next-line
-  }, [stateCtx.codec, stateCtx.mode]);
-
-  const [muteVideo, setMuteVideo] = useState(stateCtx.muteVideo);
-  const [muteAudio, setMuteAudio] = useState(stateCtx.muteAudio);
-  const [isShareScreen, setShareScreen] = useState(false);
-  const [VideoTrack, setVideoTrack] = useState(null);
-  const [AudioTrack, setAudioTrack] = useState(null);
-  const [remoteUsers, setRemoteUsers] = useState({});
-
-  const addRemoteUser = (remoteUser) => {
-    remoteUsers[remoteUser.uid] = remoteUser;
-    setRemoteUsers(remoteUsers);
-  };
-
-  const removeRemoteUser = (remoteUser) => {
-    delete remoteUsers[remoteUser.uid];
-    setRemoteUsers(remoteUsers);
-  };
+    // Hủy đăng ký khi component bị unmount
+    return () => {
+      //   localClient.off("user-published", onUserPublished);
+      //   localClient.off("user-unpublished", onUserUnpublished);
+    };
+  }, []);
 
   const config = useMemo(() => {
     return {
@@ -127,18 +74,17 @@ const MeetingPage = () => {
       host: stateCtx.config.host,
     };
     //eslint-disable-next-line
-  }, [stateCtx, muteVideo, muteAudio]);
+  }, [stateCtx]);
 
-  const history = routerCtx.history;
+  const localClient = useMemo(() => {
+    const client = new RTCClient();
+    client.createClient({ codec: stateCtx.codec, mode: stateCtx.mode });
 
-  const params = new URLSearchParams(window.location.search);
+    client.on("connection-state-change", mutationCtx.connectionStateChanged);
 
-  useEffect(() => {
-    const roleParams = params.get("role");
-    if (!config.channel && roleParams !== "audience") {
-      history.push("/");
-    }
-  }, [config.channel, history, params]);
+    return client;
+    //eslint-disable-next-line
+  }, [stateCtx.codec, stateCtx.mode]);
 
   useEffect(() => {
     if (
@@ -152,88 +98,14 @@ const MeetingPage = () => {
         .join(config.channel, config.token)
         .then((uid) => {
           config.uid = uid;
-
-          if (config.host === "host") {
-            localClient
-              .startLive(config.microphoneId, config.cameraId)
-              .then(async () => {
-                setVideoTrack(localClient.mLocalVideoTrack);
-                setAudioTrack(localClient.mLocalAudioTrack);
-                await updateCurrentLive({ uid: config.uid });
-              });
-          }
           mutationCtx.stopLoading();
         })
         .catch(async (err) => {
           await mutationCtx.toastError(`join error: ${err.info}`);
           routerCtx.history.push("/");
-          console.log("===============================", `${err.info}`);
         });
     }
   }, [localClient, mutationCtx, config, routerCtx]);
-
-  useEffect(async () => {
-    if (config.host && config.host !== "host") {
-      const currentStream = await getCurrentLive();
-      console.log(currentStream)
-      setcurrentStream(currentStream.data?.live?.currentLive);
-    }
-  }, []);
-
-  const toggleVideo = () => {
-    const newValue = !muteVideo;
-    if (newValue) {
-      localClient._client.unpublish(VideoTrack);
-    } else {
-      localClient._client.publish(VideoTrack);
-    }
-    setMuteVideo(newValue);
-  };
-
-  const toggleAudio = () => {
-    const newValue = !muteAudio;
-    if (newValue) {
-      localClient._client.unpublish(AudioTrack);
-    } else {
-      localClient._client.publish(AudioTrack);
-    }
-    setMuteAudio(newValue);
-  };
-
-  const toggleShareScreen = () => {
-    const newValue = !isShareScreen;
-    if (newValue) {
-      setShareScreen(newValue);
-
-      setMuteVideo(false);
-      setMuteAudio(false);
-
-      localClient.stopLive();
-      localClient
-        .startShareScrren()
-        .then(() => {
-          setVideoTrack(localClient.mLocalVideoTrack);
-          setAudioTrack(localClient.mLocalAudioTrack);
-        })
-        .catch((err) => {
-          mutationCtx.toastError(`No screen video code= ${err.code}`);
-        });
-    } else {
-      localClient.stopShareScrren();
-      localClient.startLive(config.microphoneId, config.cameraId).then(() => {
-        setShareScreen(newValue);
-
-        setVideoTrack(localClient.mLocalVideoTrack);
-        setAudioTrack(localClient.mLocalAudioTrack);
-      });
-    }
-  };
-
-  const doLeave = () => {
-    localClient.stopLive();
-    localClient.destroy();
-    routerCtx.history.push("/");
-  };
 
   return (
     <div className="flex w-full">
@@ -357,7 +229,7 @@ const MeetingPage = () => {
                           <i className="text-danger-100 text-[5px] fas fa-circle" />
                         </span>
                         <span className="text-white font-semibold text-xl">
-                          {formatTime(elapsedTime)}
+                          {/* {formatTime(elapsedTime)} */}
                         </span>
                       </div>
                     </div>
@@ -369,39 +241,16 @@ const MeetingPage = () => {
                       </>
                     ) : (
                       <>
-                        {config.host === "host" ? (
-                          <StreamPlayer
-                            uid={config.uid}
-                            isLocal={true}
-                            videoTrack={VideoTrack}
-                            audioTrack={AudioTrack}
-                            muteAudio={muteAudio}
-                            muteVideo={muteVideo}
-                            showInfo={stateCtx.profile}
-                            rtcClient={localClient._client}
-                          >
-                            <StreamMenu
-                              muteAudio={muteAudio}
-                              muteVideo={muteVideo}
-                              shareScreen={isShareScreen}
-                              toggleVideo={toggleVideo}
-                              toggleAudio={toggleAudio}
-                              toggleShareScreen={toggleShareScreen}
-                              doLeave={doLeave}
-                            />
-                          </StreamPlayer>
-                        ) : (
-                          <StreamPlayer
-                            uid={currentStream}
-                            isLocal={true}
-                            videoTrack={VideoTrack}
-                            audioTrack={AudioTrack}
-                            muteAudio={muteAudio}
-                            muteVideo={muteVideo}
-                            showInfo={stateCtx.profile}
-                            rtcClient={localClient._client}
-                          ></StreamPlayer>
-                        )}
+                        <StreamPlayer
+                          uid={config.uid}
+                          isLocal={true}
+                          videoTrack={VideoTrack}
+                          audioTrack={AudioTrack}
+                          muteAudio={muteAudio}
+                          muteVideo={muteVideo}
+                          showInfo={stateCtx.profile}
+                          rtcClient={localClient._client}
+                        ></StreamPlayer>
                       </>
                     )}
                   </div>
@@ -428,4 +277,4 @@ const MeetingPage = () => {
   );
 };
 
-export default React.memo(MeetingPage);
+export default Audience;

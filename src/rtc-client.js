@@ -49,6 +49,7 @@ export default class RTCClient {
     setClientRole(role) {
         console.debug('setClientRole() role: ' + role)
         this._client.setClientRole(role)
+        console.log(role)
     }
 
     startLive(microphoneId, cameraId) {

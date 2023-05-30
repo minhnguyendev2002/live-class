@@ -115,11 +115,11 @@ export default function IndexCard() {
 
   const userLogin = () => {
     mutationCtx.updateConfig({
-      host: null,
+      host: 'audience',
     });
     mutationCtx.startLoading();
     routerCtx.history.push({
-      pathname: `/meeting/wealmanagement`,
+      pathname: `/lives`,
     });
     console.log(stateCtx.currentStream)
   };
