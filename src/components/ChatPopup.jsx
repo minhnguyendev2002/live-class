@@ -7,7 +7,7 @@ import {
   createMessage,
 } from "../utils/services";
 
-const socketEndpoint = process.env.API_HOST;
+const socketEndpoint = process.env.REACT_APP_API_HOST;
 
 const ChatPopup = ({ showPopup }) => {
   const bottomDiv = useRef(null);
