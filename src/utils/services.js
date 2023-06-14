@@ -4,7 +4,7 @@ const baseURL = process.env.REACT_APP_API_HOST;
 const authToken = localStorage.getItem('currentUser') ? localStorage.getItem('currentUser') : undefined;
 
 const instance = axios.create({
-    baseURL: baseURL || 'http://localhost:3000',
+    baseURL: baseURL,
     headers: {
         'accept': 'application/json',
         'Authorization': `Bearer ${authToken}`,
