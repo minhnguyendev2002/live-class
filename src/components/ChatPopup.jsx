@@ -7,7 +7,7 @@ import {
   createMessage,
 } from "../utils/services";
 
-const socketEndpoint = "http://localhost:3000";
+const socketEndpoint = process.env.API_HOST;
 
 const ChatPopup = ({ showPopup }) => {
   const bottomDiv = useRef(null);
