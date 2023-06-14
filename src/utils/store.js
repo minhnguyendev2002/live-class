@@ -21,7 +21,7 @@ const defaultState = {
         host: true,
         channelName: `${process.env.REACT_APP_AGORA_APP_CHANNEL}`,
         token: process.env.REACT_APP_AGORA_APP_TOKEN,
-        resolution: '480p',
+        resolution: '720p',
         ...readDefaultState(),
         microphoneId: '',
         cameraId: ''

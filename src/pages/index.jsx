@@ -2,7 +2,7 @@ import React, {useEffect} from 'react'
 import {useGlobalState, useGlobalMutation} from '../utils/container'
 import {makeStyles} from '@material-ui/core/styles'
 import {Container} from '@material-ui/core'
-import IndexCard from './index/card'
+import IndexCard from '../components/BeginCard'
 
 const useStyles = makeStyles(() => ({
     container: {

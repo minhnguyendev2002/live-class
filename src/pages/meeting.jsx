@@ -2,15 +2,11 @@ import React, { useEffect, useState, useMemo } from "react";
 import { useGlobalState, useGlobalMutation } from "../utils/container";
 import useRouter from "../utils/use-router";
 import RTCClient from "../rtc-client";
-import StreamPlayer from "./meeting/stream-player";
-import StreamMenu from "./meeting/stream-menu";
+import StreamPlayer from "../components/StreamPlayer";
+import StreamMenu from "../components/StreamMenu";
 import ChatPopup from "../components/ChatPopup";
 import Loading from "../utils/loading";
-import {
-  updateCurrentLive,
-  deleteLive,
-  getCurrentLive,
-} from "../utils/services";
+import ChatModal from "../components/ChatDialog";
 
 const MeetingPage = () => {
   const routerCtx = useRouter();
@@ -20,10 +16,18 @@ const MeetingPage = () => {
   const [startTime, setStartTime] = useState(null);
   const [elapsedTime, setElapsedTime] = useState(0);
 
-  const [currentStream, setcurrentStream] = useState(0);
+  const [showPopup, setShowPopup] = useState(true);
+  const togglePopup = () => {
+    setShowPopup(!showPopup);
+  };
+
+  const [showChatDialog, setShowChatDialog] = useState(false);
+  const toggleChatDialog = () => {
+    setShowChatDialog(!showChatDialog);
+    setShowPopup(true);
+  };
 
   useEffect(() => {
-    // Cập nhật thời gian đếm sau mỗi giây
     const timer = setInterval(() => {
       if (startTime) {
         const currentTime = new Date();
@@ -32,7 +36,6 @@ const MeetingPage = () => {
       }
     }, 1000);
 
-    // Xóa timer khi component bị unmount hoặc khi kết thúc livestream
     return () => {
       clearInterval(timer);
     };
@@ -111,7 +114,6 @@ const MeetingPage = () => {
               .then(async () => {
                 setVideoTrack(localClient.mLocalVideoTrack);
                 setAudioTrack(localClient.mLocalAudioTrack);
-                console.log('===============================================', localClient)
               });
           }
           mutationCtx.stopLoading();
@@ -173,14 +175,14 @@ const MeetingPage = () => {
   };
 
   const doLeave = () => {
-    localClient.destroy();
     localClient.stopLive();
+    localClient.destroy();
     routerCtx.history.push("/");
   };
 
   return (
     <div className="flex w-full">
-      <div className="flex flex-col justify-between items-center py-10 px-3">
+      <div className="hidden sm:flex flex-col justify-between items-center py-10 px-3">
         <div>
           <img
             className="w-10 h-10 object-cover"
@@ -235,18 +237,9 @@ const MeetingPage = () => {
                       <span className="mr-2">
                         <i className="fas fa-users" />
                       </span>
-                      Số người xem:{" "}
+                      Số người xem:
                       <span className="bg-success-20 text-success-100 py-1 px-2 rounded ml-2">
                         2
-                      </span>
-                    </div>
-                    <div className="font-semibold text-lg ">
-                      <span className="mr-2">
-                        <i className="fas fa-user-slash" />
-                      </span>
-                      Người vắng mặt:{" "}
-                      <span className="bg-danger-20 text-danger-100 py-1 px-2 rounded ml-2">
-                        1
                       </span>
                     </div>
                   </div>
@@ -257,16 +250,13 @@ const MeetingPage = () => {
                       </span>
                       Chia sẻ Live Stream
                     </div>
-                    <div className="group hover:bg-[#d1e6e7] border-2 border-solid border-transparent duration-300 cursor-pointer hidden lg:flex items-center gap-3 py-1 px-2 rounded">
+                    <div
+                      className="group hover:bg-[#d1e6e7] border-2 border-solid border-transparent duration-300 cursor-pointer hidden lg:flex items-center gap-3 py-1 px-2 rounded"
+                      onClick={togglePopup}
+                    >
                       <i className="fas fa-comments text-xl text-[#00a389] duration-300" />
                       <span className="font-semibold text-lg text-[#00a389] duration-300">
-                        ẩn
-                      </span>
-                    </div>
-                    <div className="group hover:bg-[#d1e6e7] border-2 border-solid border-transparent duration-300 cursor-pointer lg:hidden flex items-center gap-3 py-2 px-3 rounded">
-                      <i className="fas fa-comments text-xl text-[#00a389] duration-300" />
-                      <span className="font-semibold text-lg text-[#00a389] duration-300">
-                        Xem bình luận
+                        {showPopup ? "Ẩn bình luận" : "Hiện bình luận"}
                       </span>
                     </div>
                   </div>
@@ -286,7 +276,15 @@ const MeetingPage = () => {
                     </div>
                   </div>
                   <div className="stream-player h-full" id="stream-player-0">
-                    <div className="absolute z-20 top-5 left-1/2 -translate-x-1/2 flex w-max justify-between gap-5">
+                    <div className="absolute z-20 top-5 sm:left-1/2 sm:-translate-x-1/2 right-3 flex w-max justify-between gap-5">
+                      <div className="z-[10] flex items-center gap-5 pl-6 pr-8 py-3 rounded-lg bg-white/40 text-white flex-shrink-0">
+                        <span className="p-1 rounded-full w-3 h-3 flex flex-col justify-center items-center bg-white text-center">
+                          <i className="text-danger-100 text-[5px] fas fa-circle" />
+                        </span>
+                        <span className="text-white font-semibold text-xl">
+                          {/* {formatTime(elapsedTime)} */}
+                        </span>
+                      </div>
                       <div className="sm:hidden z-[10] flex items-center gap-3 pl-2 pr-5 py-2 rounded-full bg-white/40 text-white flex-shrink-0">
                         <span className="p-2 rounded-full w-8 h-8 flex flex-col justify-center items-center bg-white text-center">
                           <i className="fas fa-eye text-success-100" />
@@ -295,78 +293,50 @@ const MeetingPage = () => {
                           1
                         </span>
                       </div>
-                      <div className="z-[10] flex items-center gap-5 pl-6 pr-8 py-3 rounded-lg bg-white/40 text-white flex-shrink-0">
-                        <span className="p-1 rounded-full w-3 h-3 flex flex-col justify-center items-center bg-white text-center">
-                          <i className="text-danger-100 text-[5px] fas fa-circle" />
-                        </span>
-                        <span className="text-white font-semibold text-xl">
-                          {formatTime(elapsedTime)}
-                        </span>
-                      </div>
                     </div>
-
-                    <div className="stream-uid">UID: 0</div>
                     {stateCtx.loading ? (
                       <>
                         <Loading />
                       </>
                     ) : (
                       <>
-                        {config.host === "host" ? (
-                          <StreamPlayer
-                            uid={config.uid}
-                            isLocal={true}
-                            videoTrack={VideoTrack}
-                            audioTrack={AudioTrack}
+                        <StreamPlayer
+                          uid={config.uid}
+                          isLocal={true}
+                          videoTrack={VideoTrack}
+                          audioTrack={AudioTrack}
+                          muteAudio={muteAudio}
+                          muteVideo={muteVideo}
+                          showInfo={stateCtx.profile}
+                          rtcClient={localClient._client}
+                        >
+                          <StreamMenu
                             muteAudio={muteAudio}
                             muteVideo={muteVideo}
-                            showInfo={stateCtx.profile}
-                            rtcClient={localClient._client}
-                          >
-                            <StreamMenu
-                              muteAudio={muteAudio}
-                              muteVideo={muteVideo}
-                              shareScreen={isShareScreen}
-                              toggleVideo={toggleVideo}
-                              toggleAudio={toggleAudio}
-                              toggleShareScreen={toggleShareScreen}
-                              doLeave={doLeave}
-                            />
-                          </StreamPlayer>
-                        ) : (
-                          <StreamPlayer
-                            uid={currentStream}
-                            isLocal={true}
-                            videoTrack={VideoTrack}
-                            audioTrack={AudioTrack}
-                            muteAudio={muteAudio}
-                            muteVideo={muteVideo}
-                            showInfo={stateCtx.profile}
-                            rtcClient={localClient._client}
-                          ></StreamPlayer>
-                        )}
+                            shareScreen={isShareScreen}
+                            toggleVideo={toggleVideo}
+                            toggleAudio={toggleAudio}
+                            toggleShareScreen={toggleShareScreen}
+                            doLeave={doLeave}
+                            showPopupComment={toggleChatDialog}
+                          />
+                        </StreamPlayer>
                       </>
                     )}
                   </div>
-                  <div className="absolute bottom-11 left-10 sm:left-20 z-20 hidden sm:inline-block">
-                    <div className="group">
-                      <div className="group-hover:h-[150px] h-[40px] group-hover:pt-5 duration-300 overflow-hidden w-[40px] flex flex-col bg-white/40 rounded-full">
-                        <div className="flex-1 invisible !mx-auto group-hover:visible duration-100 transition-all" />
-                        <div className="text-center h-[40px] flex flex-col items-center justify-center ">
-                          <i className="text-white fas fa-volume-down text-xl" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
-              <div className="w-[380px] ml-10 hidden lg:block duration-500">
-                <ChatPopup />
+              <div className="lg:block hidden">
+                <ChatPopup showPopup={showPopup} />
               </div>
             </div>
           </div>
         </div>
       </div>
+      <ChatModal
+        showChatModal={showChatDialog}
+        hiddenChatModal={() => setShowChatDialog(false)}
+      />
     </div>
   );
 };
