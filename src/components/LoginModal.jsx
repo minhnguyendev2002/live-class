@@ -10,6 +10,7 @@ const LoginModal = ({ showLoginModal, hiddenLoginModal }) => {
     try {
       const { data } = await login(values);
       localStorage.setItem("currentUser", data.accessToken);
+      window.location.reload();
       hiddenLoginModal();
     } catch {
       messageApi.info("Đã có lỗi xảy ra");

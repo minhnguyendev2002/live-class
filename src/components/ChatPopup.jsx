@@ -76,9 +76,7 @@ const ChatPopup = ({ showPopup }) => {
     try {
       const { data } = await getAllMessage();
       setChat(data?.messages || []);
-      if (bottomDiv.current) {
-        bottomDiv.current.scrollIntoView({ behavior: "smooth" });
-      }
+      bottomDiv.current.scrollIntoView({ behavior: "smooth" });
     } catch (error) {
       console.log(error);
     }
