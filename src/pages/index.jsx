@@ -28,9 +28,11 @@ const Index = () => {
     }, [stateCtx.loading, mutationCtx])
 
     return (
-        <Container maxWidth="sm" className={classes.container}>
-            <IndexCard />
-        </Container>
+        <>
+            <div className='h-screen w-screen'>
+                <IndexCard />
+            </div>
+        </>
     )
 }
 
