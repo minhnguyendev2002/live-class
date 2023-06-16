@@ -2,12 +2,12 @@ import AgoraRTC from 'agora-rtc-sdk-ng'
 import EventEmitter from 'events'
 
 const appID = process.env.REACT_APP_AGORA_APP_ID
-console.log(
-    'agora sdk version: ' +
-    AgoraRTC.VERSION +
-    ' compatible: ' +
-    AgoraRTC.checkSystemRequirements()
-)
+// console.log(
+//     'agora sdk version: ' +
+//     AgoraRTC.VERSION +
+//     ' compatible: ' +
+//     AgoraRTC.checkSystemRequirements()
+// )
 export default class RTCClient {
     constructor() {
         this._client = null
@@ -30,14 +30,14 @@ export default class RTCClient {
             mode: data?.mode ? data.mode : 'live',
             codec: data?.codec ? data.codec : 'vp8'
         }
-        console.debug('createClient() mode: ' + config.mode + ' codec: ' + config.codec)
+        // console.debug('createClient() mode: ' + config.mode + ' codec: ' + config.codec)
         this._client = AgoraRTC.createClient(config)
         this._created = true
         return this._client
     }
 
     destroy() {
-        console.debug('destroy()')
+        // console.debug('destroy()')
         this._created = false
         this._client = null
     }
@@ -47,14 +47,14 @@ export default class RTCClient {
     }
 
     setClientRole(role) {
-        console.debug('setClientRole() role: ' + role)
+        // console.debug('setClientRole() role: ' + role)
         this._client.setClientRole(role)
-        console.log(role)
+        // console.log(role)
     }
 
     startLive(microphoneId, cameraId) {
         return new Promise((resolve, reject) => {
-            console.debug('startLive()')
+            // console.debug('startLive()')
 
             AgoraRTC.createMicrophoneAndCameraTracks({microphoneId: microphoneId}, {cameraId: cameraId})
                 .then((tracks) => {
@@ -71,7 +71,7 @@ export default class RTCClient {
     }
 
     stopLive() {
-        console.debug('stopLive()')
+        // console.debug('stopLive()')
 
         if (this.mLocalAudioTrack) {
             this._client.unpublish(this.mLocalAudioTrack)
@@ -106,7 +106,7 @@ export default class RTCClient {
     }
 
     stopShareScrren() {
-        console.debug('stopShareScrren()')
+        // console.debug('stopShareScrren()')
 
         if (this.mLocalAudioTrack) {
             this._client.unpublish(this.mLocalAudioTrack)
@@ -129,7 +129,7 @@ export default class RTCClient {
         return new Promise((resolve, reject) => {
             this._client.subscribe(user, mediaType)
                 .then(mRemoteTrack => {
-                    console.debug(`subscribe success user=${user.uid}, mediaType=${mediaType}`)
+                    // console.debug(`subscribe success user=${user.uid}, mediaType=${mediaType}`)
                     resolve(mRemoteTrack)
                 })
                 .catch(e => {
@@ -144,7 +144,7 @@ export default class RTCClient {
                 this.createClient()
             }
 
-            console.debug('getDevices()')
+            // console.debug('getDevices()')
 
             if (this.mLocalAudioTrack) {
                 this.mLocalAudioTrack.stop()
@@ -195,12 +195,12 @@ export default class RTCClient {
             this._joined = true
             this._leave = false
             this._uid = 0
-            console.debug('join appID: ' + appID + ',channel: ' + channel)
+            // console.debug('join appID: ' + appID + ',channel: ' + channel)
 
             this._client.join(appID, channel, token || null).then(uid => {
-                console.debug(
-                    'join success, channel: ' + channel + ', uid: ' + uid
-                )
+                // console.debug(
+                //     'join success, channel: ' + channel + ', uid: ' + uid
+                // )
 
                 this._uid = uid
                 this._joined = true
@@ -210,7 +210,7 @@ export default class RTCClient {
                 .catch(e => {
                     this._joined = false
                     reject(e)
-                    console.error('join error: ' + e)
+                    // console.error('join error: ' + e)
                 })
         })
     }
@@ -222,19 +222,19 @@ export default class RTCClient {
                 return
             }
 
-            console.debug('leave()')
+            // console.debug('leave()')
             this._leave = true
             if (!this._client) return resolve()
 
             this._client.leave()
                 .then(() => {
-                    console.debug('leave() success')
+                    // console.debug('leave() success')
                     this._joined = false
                     this._uid = null
                     resolve()
                 })
                 .catch((e) => {
-                    console.error('leave failed: ' + e)
+                    // console.error('leave failed: ' + e)
                 })
         })
     }

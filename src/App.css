@@ -583,3 +583,7 @@ body {
 .ant-slider-handle {
     border-color: white !important;
 }
+
+.ant-popconfirm .ant-popconfirm-buttons .ant-btn-primary {
+    background-color: #1677ff !important;
+}

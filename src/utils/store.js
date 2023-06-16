@@ -34,6 +34,8 @@ const defaultState = {
     screen: false,
     profile: false,
     isStream: false,
+
+    userConnected: 0,
 }
 
 const reducer = (state, action) => {
@@ -149,8 +151,14 @@ const reducer = (state, action) => {
         case 'isStream': {
             return {...state, isStream: action.payload}
         }
+        case 'userConnected': {
+            return {
+                ...state, 
+                userConnected: action.payload
+            }
+        }
         default:
-            throw new Error('mutation type not defined')
+            throw new Error('mutation type not defined ...')
     }
 }
 

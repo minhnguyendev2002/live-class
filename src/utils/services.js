@@ -16,3 +16,4 @@ export const getCurrentUser = (params) => instance.get('/api/u/sessions/account'
 
 export const getAllMessage = (params) => instance.get('/api/u/live-chat', params).then((_) => _.data);
 export const createMessage = (params) => instance.post('/api/u/live-chat', params).then((_) => _.data);
+export const deleteMessage = (id) => instance.delete(`/api/u/live-chat/${id}`).then((_) => _.data);

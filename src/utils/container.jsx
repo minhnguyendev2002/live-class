@@ -111,6 +111,9 @@ export const ContainerProvider = ({ children }) => {
     getCurrentStream(value) {
       dispatch({ type: "isStream", isStream: value });
     },
+    setUserConnected(param) {
+      dispatch({ type: "userConnected", payload: param });
+    },
     // enableBeauty(enable) {
     //   dispatch({type: 'enableBeauty', enable});
     // }

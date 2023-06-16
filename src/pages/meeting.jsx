@@ -6,53 +6,34 @@ import StreamPlayer from "../components/StreamPlayer";
 import StreamMenu from "../components/StreamMenu";
 import ChatPopup from "../components/ChatPopup";
 import Loading from "../utils/loading";
-import ChatModal from "../components/ChatDialog";
+import BottomChat from "../components/BottomChat";
 
 const MeetingPage = () => {
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   const routerCtx = useRouter();
   const stateCtx = useGlobalState();
   const mutationCtx = useGlobalMutation();
 
-  const [startTime, setStartTime] = useState(null);
-  const [elapsedTime, setElapsedTime] = useState(0);
+  const [userConnected, setUserConnected] = useState(0);
 
   const [showPopup, setShowPopup] = useState(true);
   const togglePopup = () => {
     setShowPopup(!showPopup);
   };
 
-  const [showChatDialog, setShowChatDialog] = useState(false);
-  const toggleChatDialog = () => {
-    setShowChatDialog(!showChatDialog);
-    setShowPopup(true);
-  };
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      if (startTime) {
-        const currentTime = new Date();
-        const elapsed = Math.round((currentTime - startTime) / 1000);
-        setElapsedTime(elapsed);
-      }
-    }, 1000);
-
-    return () => {
-      clearInterval(timer);
-    };
-  }, [startTime]);
-
-  const formatTime = (time) => {
-    const hours = Math.floor(time / 3600);
-    const minutes = Math.floor((time % 3600) / 60);
-    const seconds = time % 60;
-
-    return hours
-      ? `${hours.toString().padStart(2, "0")}:${minutes
-          .toString()
-          .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
-      : `${minutes.toString().padStart(2, "0")}:${seconds
-          .toString()
-          .padStart(2, "0")}`;
+  const [showControll, setShowControll] = useState(true);
+  const toggleControll = () => {
+    setShowControll(!showControll);
   };
 
   const localClient = useMemo(() => {
@@ -180,6 +161,13 @@ const MeetingPage = () => {
     routerCtx.history.push("/");
   };
 
+  useEffect(() => {
+    return () => {
+      localClient.stopLive();
+      localClient.destroy();
+    };
+  }, []);
+
   return (
     <div className="flex w-full">
       <div className="hidden sm:flex flex-col justify-between items-center py-10 px-3">
@@ -220,7 +208,7 @@ const MeetingPage = () => {
       </div>
       <div className="flex-1">
         <div className="w-full h-full">
-          <div className="sm:p-5 py-2 px-2 bg-white h-screen">
+          <div className="sm:p-5 p-0 bg-white h-screen">
             <div className="flex h-full overflow-hidden">
               <div className="flex-1 flex flex-col">
                 <div className="hidden sm:block">
@@ -239,7 +227,7 @@ const MeetingPage = () => {
                       </span>
                       Số người xem:
                       <span className="bg-success-20 text-success-100 py-1 px-2 rounded ml-2">
-                        2
+                        {userConnected}
                       </span>
                     </div>
                   </div>
@@ -261,7 +249,7 @@ const MeetingPage = () => {
                     </div>
                   </div>
                 </div>
-                <div className="flex-1 relative bg-black rounded-xl w-full h-full overflow-hidden">
+                <div className="flex-1 relative bg-black sm:rounded-xl w-full h-full overflow-hidden">
                   <div className="absolute top-5 left-5 z-[20] flex items-center gap-3">
                     <img
                       className="w-12 h-12 rounded object-cover"
@@ -277,12 +265,9 @@ const MeetingPage = () => {
                   </div>
                   <div className="stream-player h-full" id="stream-player-0">
                     <div className="absolute z-20 top-5 sm:left-1/2 sm:-translate-x-1/2 right-3 flex w-max justify-between gap-5">
-                      <div className="z-[10] flex items-center gap-5 pl-6 pr-8 py-3 rounded-lg bg-white/40 text-white flex-shrink-0">
+                      <div className="z-[10] hidden sm:flex justify-center items-center gap-5 pl-8 pr-8 py-3 rounded-lg bg-white/40 text-white flex-shrink-0">
                         <span className="p-1 rounded-full w-3 h-3 flex flex-col justify-center items-center bg-white text-center">
                           <i className="text-danger-100 text-[5px] fas fa-circle" />
-                        </span>
-                        <span className="text-white font-semibold text-xl">
-                          {/* {formatTime(elapsedTime)} */}
                         </span>
                       </div>
                       <div className="sm:hidden z-[10] flex items-center gap-3 pl-2 pr-5 py-2 rounded-full bg-white/40 text-white flex-shrink-0">
@@ -290,7 +275,7 @@ const MeetingPage = () => {
                           <i className="fas fa-eye text-success-100" />
                         </span>
                         <span className="text-white font-semibold text-lg">
-                          1
+                          {userConnected}
                         </span>
                       </div>
                     </div>
@@ -318,8 +303,18 @@ const MeetingPage = () => {
                             toggleAudio={toggleAudio}
                             toggleShareScreen={toggleShareScreen}
                             doLeave={doLeave}
-                            showPopupComment={toggleChatDialog}
+                            toggleControll={toggleControll}
+                            showControll={showControll}
                           />
+                          {windowWidth <= 1024 && (
+                            <BottomChat
+                              toggleControll={toggleControll}
+                              isHost={true}
+                              setUserConnected={(value) =>
+                                setUserConnected(value)
+                              }
+                            />
+                          )}
                         </StreamPlayer>
                       </>
                     )}
@@ -327,16 +322,17 @@ const MeetingPage = () => {
                 </div>
               </div>
               <div className="lg:block hidden">
-                <ChatPopup showPopup={showPopup} />
+                {windowWidth > 1024 && (
+                  <ChatPopup
+                    showPopup={showPopup}
+                    setUserConnected={(value) => setUserConnected(value)}
+                  />
+                )}
               </div>
             </div>
           </div>
         </div>
       </div>
-      <ChatModal
-        showChatModal={showChatDialog}
-        hiddenChatModal={() => setShowChatDialog(false)}
-      />
     </div>
   );
 };

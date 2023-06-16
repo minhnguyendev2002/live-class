@@ -6,9 +6,32 @@ import StreamPlayer from "../components/StreamPlayer";
 import ChatPopup from "../components/ChatPopup";
 import Loading from "../utils/loading";
 import AudienceMenu from "../components/AudienceMenu";
-import ChatModal from "../components/ChatDialog";
+import BottomChat from "../components/BottomChat";
+
+function formatNumber(number) {
+  if (number < 1000) {
+    return number.toString();
+  } else if (number < 1000000) {
+    return (number / 1000).toFixed(1) + 'K';
+  } else if (number < 1000000000) {
+    return (number / 1000000).toFixed(1) + 'M';
+  } else {
+    return (number / 1000000000).toFixed(1) + 'B';
+  }
+}
 
 const Audience = () => {
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
   const routerCtx = useRouter();
   const stateCtx = useGlobalState();
   const mutationCtx = useGlobalMutation();
@@ -92,6 +115,22 @@ const Audience = () => {
     }
   }, [localClient, mutationCtx, config, routerCtx]);
 
+  const [userCount, setUserCount] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const randomIncrement = Math.floor(Math.random() * 6) + 5;
+      setUserCount(prevCount => {
+        const newCount = prevCount + randomIncrement;
+        return newCount <= 1000000 ? newCount : 1000000;
+      });
+    }, 1000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+  
   return (
     <div className="flex w-full">
       <div className="hidden sm:flex flex-col justify-between items-center py-10 px-3">
@@ -132,7 +171,7 @@ const Audience = () => {
       </div>
       <div className="flex-1">
         <div className="w-full h-full">
-          <div className="sm:p-5 py-2 px-2 bg-white h-screen">
+          <div className="sm:p-5 p-0 bg-white h-screen">
             <div className="flex h-full overflow-hidden">
               <div className="flex-1 flex flex-col">
                 <div className="hidden sm:block">
@@ -149,9 +188,9 @@ const Audience = () => {
                       <span className="mr-2">
                         <i className="fas fa-users" />
                       </span>
-                      Số người xem:{" "}
+                      Số người xem:
                       <span className="bg-success-20 text-success-100 py-1 px-2 rounded ml-2">
-                        2
+                      {formatNumber(userCount)}
                       </span>
                     </div>
                   </div>
@@ -173,7 +212,7 @@ const Audience = () => {
                     </div>
                   </div>
                 </div>
-                <div className="flex-1 relative bg-black rounded-xl w-full h-full overflow-hidden">
+                <div className="flex-1 relative bg-black sm:rounded-xl w-full h-full overflow-hidden">
                   <div className="absolute top-5 left-5 z-[20] flex items-center gap-3">
                     <img
                       className="w-12 h-12 rounded object-cover"
@@ -189,12 +228,9 @@ const Audience = () => {
                   </div>
                   <div className="stream-player h-full" id="stream-player-0">
                     <div className="absolute z-20 top-5 sm:left-1/2 sm:-translate-x-1/2 right-3 flex w-max justify-between gap-5">
-                      <div className="z-[10] flex items-center gap-5 pl-6 pr-8 py-3 rounded-lg bg-white/40 text-white flex-shrink-0">
+                      <div className="z-[10] hidden sm:flex justify-center items-center gap-5 pl-8 pr-8 py-3 rounded-lg bg-white/40 text-white flex-shrink-0">
                         <span className="p-1 rounded-full w-3 h-3 flex flex-col justify-center items-center bg-white text-center">
                           <i className="text-danger-100 text-[5px] fas fa-circle" />
-                        </span>
-                        <span className="text-white font-semibold text-xl">
-                          {/* {formatTime(elapsedTime)} */}
                         </span>
                       </div>
                       <div className="sm:hidden z-[10] flex items-center gap-3 pl-2 pr-5 py-2 rounded-full bg-white/40 text-white flex-shrink-0">
@@ -202,7 +238,7 @@ const Audience = () => {
                           <i className="fas fa-eye text-success-100" />
                         </span>
                         <span className="text-white font-semibold text-lg">
-                          1
+                          {formatNumber(userCount)}
                         </span>
                       </div>
                     </div>
@@ -223,6 +259,7 @@ const Audience = () => {
                           rtcClient={localClient._client}
                         >
                           <AudienceMenu showPopupComment={toggleChatDialog} />
+                          { windowWidth <= 1024 && <BottomChat /> }
                         </StreamPlayer>
                       </>
                     )}
@@ -230,16 +267,12 @@ const Audience = () => {
                 </div>
               </div>
               <div className="lg:block hidden">
-                <ChatPopup showPopup={showPopup} />
+              { windowWidth > 1024 && <ChatPopup showPopup={showPopup} /> }
               </div>
             </div>
           </div>
         </div>
       </div>
-      <ChatModal
-        showChatModal={showChatDialog}
-        hiddenChatModal={() => setShowChatDialog(false)}
-      />
     </div>
   );
 };
