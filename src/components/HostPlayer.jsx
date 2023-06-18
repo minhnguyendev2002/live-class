@@ -23,10 +23,10 @@ export default function StreamPlayer(props) {
         if (videoTrack != null) {
             if (muteAudio === true) {
                 audioTrack.stop()
-                audioTrack.setPlaybackDeviceVolume(0);
             } else if (muteAudio === false && audioTrack) {
                 audioTrack.play()
-                audioTrack.setPlaybackDeviceVolume(0);
+                console.log("================================", audioTrack);
+                // audioTrack.muted();
             }
         }
         //eslint-disable-next-line
