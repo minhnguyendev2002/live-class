@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import { useGlobalState, useGlobalMutation } from "../utils/container";
 import useRouter from "../utils/use-router";
 import RTCClient from "../rtc-client";
-import StreamPlayer from "../components/StreamPlayer";
+import StreamPlayer from "../components/HostPlayer";
 import StreamMenu from "../components/StreamMenu";
 import ChatPopup from "../components/ChatPopup";
 import Loading from "../utils/loading";
