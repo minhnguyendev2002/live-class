@@ -94,7 +94,7 @@ const MeetingPage = () => {
               .startLive(config.microphoneId, config.cameraId)
               .then(async () => {
                 setVideoTrack(localClient.mLocalVideoTrack);
-                setAudioTrack(localClient.mLocalAudioTrack);
+                // setAudioTrack(localClient.mLocalAudioTrack);
               });
           }
           mutationCtx.stopLoading();

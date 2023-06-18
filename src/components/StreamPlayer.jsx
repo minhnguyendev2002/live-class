@@ -22,9 +22,9 @@ export default function StreamPlayer(props) {
     useMemo(() => {
         if (videoTrack != null) {
             if (muteAudio === true) {
-                // audioTrack.stop()
+                audioTrack.stop()
             } else if (muteAudio === false && audioTrack) {
-                // audioTrack.play()
+                audioTrack.play()
             }
         }
         //eslint-disable-next-line
