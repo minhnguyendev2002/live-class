@@ -95,7 +95,6 @@ const MeetingPage = () => {
               .then(async () => {
                 setVideoTrack(localClient.mLocalVideoTrack);
                 setAudioTrack(localClient.mLocalAudioTrack);
-                localClient.disableAudio();
               });
           }
           mutationCtx.stopLoading();

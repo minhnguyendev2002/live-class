@@ -25,8 +25,6 @@ export default function StreamPlayer(props) {
                 audioTrack.stop()
             } else if (muteAudio === false && audioTrack) {
                 audioTrack.play()
-                console.log("================================", audioTrack);
-                audioTrack.setVolume(0);
             }
         }
         //eslint-disable-next-line
