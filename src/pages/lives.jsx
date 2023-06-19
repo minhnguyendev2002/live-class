@@ -12,11 +12,11 @@ function formatNumber(number) {
   if (number < 1000) {
     return number.toString();
   } else if (number < 1000000) {
-    return (number / 1000).toFixed(1) + 'K';
+    return (number / 1000).toFixed(1) + "K";
   } else if (number < 1000000000) {
-    return (number / 1000000).toFixed(1) + 'M';
+    return (number / 1000000).toFixed(1) + "M";
   } else {
-    return (number / 1000000000).toFixed(1) + 'B';
+    return (number / 1000000000).toFixed(1) + "B";
   }
 }
 
@@ -26,9 +26,9 @@ const Audience = () => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
     };
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
@@ -119,8 +119,8 @@ const Audience = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const randomIncrement = Math.floor(Math.random() * 6) + 5;
-      setUserCount(prevCount => {
+      const randomIncrement = Math.floor(Math.random() * 3) + 2;
+      setUserCount((prevCount) => {
         const newCount = prevCount + randomIncrement;
         return newCount <= 1000000 ? newCount : 1000000;
       });
@@ -130,14 +130,14 @@ const Audience = () => {
       clearInterval(interval);
     };
   }, []);
-  
+
   return (
     <div className="flex w-full">
       <div className="hidden sm:flex flex-col justify-between items-center py-10 px-3">
         <div>
           <img
             className="w-10 h-10 object-cover"
-            src="/public/logo-thumnail.png"
+            src="/images/logo-thumnail.png"
             alt=""
           />
         </div>
@@ -162,11 +162,12 @@ const Audience = () => {
           </div>
         </div>
         <div>
-          <img
+          <div className="w-10 h-10 object-cover rounded-full shadow-chat"></div>
+          {/* <img
             className="w-10 h-10 object-cover rounded-full shadow-chat"
             src="https://cdn.pixabay.com/photo/2017/01/31/21/23/avatar-2027366_1280.png"
             alt=""
-          />
+          /> */}
         </div>
       </div>
       <div className="flex-1">
@@ -190,7 +191,7 @@ const Audience = () => {
                       </span>
                       Số người xem:
                       <span className="bg-success-20 text-success-100 py-1 px-2 rounded ml-2">
-                      {formatNumber(userCount)}
+                        {formatNumber(userCount)}
                       </span>
                     </div>
                   </div>
@@ -259,7 +260,7 @@ const Audience = () => {
                           rtcClient={localClient._client}
                         >
                           <AudienceMenu showPopupComment={toggleChatDialog} />
-                          { windowWidth <= 1024 && <BottomChat /> }
+                          {windowWidth <= 1024 && <BottomChat />}
                         </StreamPlayer>
                       </>
                     )}
@@ -267,7 +268,7 @@ const Audience = () => {
                 </div>
               </div>
               <div className="lg:block hidden">
-              { windowWidth > 1024 && <ChatPopup showPopup={showPopup} /> }
+                {windowWidth > 1024 && <ChatPopup showPopup={showPopup} />}
               </div>
             </div>
           </div>

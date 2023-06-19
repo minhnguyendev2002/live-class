@@ -201,11 +201,12 @@ const MeetingPage = () => {
           </div>
         </div>
         <div>
-          <img
+          <div className="w-10 h-10 object-cover rounded-full shadow-chat"></div>
+          {/* <img
             className="w-10 h-10 object-cover rounded-full shadow-chat"
             src="https://cdn.pixabay.com/photo/2017/01/31/21/23/avatar-2027366_1280.png"
             alt=""
-          />
+          /> */}
         </div>
       </div>
       <div className="flex-1">
