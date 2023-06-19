@@ -84,6 +84,7 @@ const MeetingPage = () => {
       localClient._leave === false
     ) {
       localClient.setClientRole(config.host === "host" ? "host" : "audience");
+      localClient.setRecordingAudioFrameParameters(32000, 0, 16, 480);
       localClient
         .join(config.channel, config.token)
         .then((uid) => {
