@@ -176,7 +176,7 @@ const MeetingPage = () => {
         <div>
           <img
             className="w-10 h-10 object-cover"
-            src="/public/logo-thumnail.png"
+            src="/images/logo-thumnail.png"
             alt=""
           />
         </div>
