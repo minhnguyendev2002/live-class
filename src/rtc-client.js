@@ -52,26 +52,42 @@ export default class RTCClient {
         // console.log(role)
     }
 
-    startLive(microphoneId, cameraId) {
+    startLive(microphoneId, cameraId, host) {
         return new Promise((resolve, reject) => {
             // console.debug('startLive()')
 
-            AgoraRTC.createMicrophoneAndCameraTracks({microphoneId: microphoneId}, {cameraId: cameraId})
-                .then((tracks) => {
-                    this.mLocalAudioTrack = tracks[0]
-                    this.mLocalVideoTrack = tracks[1]
-                    this._client.publish([this.mLocalAudioTrack, this.mLocalVideoTrack])
+            if (host) {
+                const cameraPromise = AgoraRTC.createCameraVideoTrack({ cameraId });
+                const microphonePromise = AgoraRTC.createMicrophoneAudioTrack({ microphoneId: microphoneId, ANS: true, AGC: true, AEC:true });
 
-                    resolve()
-                })
-                .catch(e => {
-                    reject(e)
-                })
+                Promise.all([cameraPromise, microphonePromise])
+                    .then(([videoTrack, audioTrack]) => {
+                        this.mLocalVideoTrack = videoTrack;
+                        this.mLocalAudioTrack = audioTrack;
+                        this._client.publish([this.mLocalAudioTrack, this.mLocalVideoTrack]);
+                        resolve();
+                    })
+                    .catch((e) => {
+                        reject(e);
+                    });
+            } else {
+                AgoraRTC.createMicrophoneAndCameraTracks({ microphoneId: microphoneId }, { cameraId: cameraId })
+                    .then((tracks) => {
+                        this.mLocalAudioTrack = tracks[0]
+                        this.mLocalVideoTrack = tracks[1]
+                        this._client.publish([this.mLocalAudioTrack, this.mLocalVideoTrack])
+
+                        resolve()
+                    })
+                    .catch(e => {
+                        reject(e)
+                    })
+            }
         })
     }
 
     stopLive() {
-        // console.debug('stopLive()')
+        // console.debug('stopLive()')D
 
         if (this.mLocalAudioTrack) {
             this._client.unpublish(this.mLocalAudioTrack)
@@ -129,7 +145,6 @@ export default class RTCClient {
         return new Promise((resolve, reject) => {
             this._client.subscribe(user, mediaType)
                 .then(mRemoteTrack => {
-                    // console.debug(`subscribe success user=${user.uid}, mediaType=${mediaType}`)
                     resolve(mRemoteTrack)
                 })
                 .catch(e => {
@@ -164,6 +179,7 @@ export default class RTCClient {
                     this.mLocalVideoTrack = tracks[1]
 
                     AgoraRTC.getDevices().then(it => {
+                        console.log("==================================", it)
                         resolve(it)
 
                         if (this.mLocalAudioTrack) {

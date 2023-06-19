@@ -20,11 +20,16 @@ export default function StreamPlayer(props) {
     }, [muteVideo, videoTrack])
 
     useMemo(() => {
+        // const audioElement = new Audio();
+        // audioElement.muted = true;
         if (videoTrack != null) {
             if (muteAudio === true) {
                 audioTrack.stop()
             } else if (muteAudio === false && audioTrack) {
-                audioTrack.play()
+                audioTrack.play();
+                audioTrack.unpipe();
+                // audioTrack.setPlaybackDevice('communications');
+                // audioElement.muted = true;
             }
         }
         //eslint-disable-next-line
@@ -82,6 +87,7 @@ export default function StreamPlayer(props) {
         <div
             className={'stream-player'}
             id={`stream-player-${uid}`}
+            muted={true}
         >
             {props.children}
         </div>

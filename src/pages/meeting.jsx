@@ -83,17 +83,18 @@ const MeetingPage = () => {
       localClient._joined === false &&
       localClient._leave === false
     ) {
-      localClient.setClientRole(config.host === "host" ? "host" : "audience");
-      localClient.setRecordingAudioFrameParameters(32000, 0, 16, 480);
+      localClient.setClientRole("host");
       localClient
         .join(config.channel, config.token)
         .then((uid) => {
           config.uid = uid;
-
           if (config.host === "host") {
             localClient
-              .startLive(config.microphoneId, config.cameraId)
+              .startLive(config.microphoneId, config.cameraId, true)
               .then(async () => {
+                // localClient.getDevices(e => {
+                //   console.log(e)
+                // })
                 setVideoTrack(localClient.mLocalVideoTrack);
                 setAudioTrack(localClient.mLocalAudioTrack);
               });
@@ -120,9 +121,9 @@ const MeetingPage = () => {
   const toggleAudio = () => {
     const newValue = !muteAudio;
     if (newValue) {
-      localClient._client.unpublish(AudioTrack);
+      localClient._client.unpublish(localClient.mLocalAudioTrack);
     } else {
-      localClient._client.publish(AudioTrack);
+      localClient._client.publish(localClient.mLocalAudioTrack);
     }
     setMuteAudio(newValue);
   };
@@ -175,7 +176,7 @@ const MeetingPage = () => {
         <div>
           <img
             className="w-10 h-10 object-cover"
-            src="https://inkythuatso.com/uploads/images/2021/11/porsche-logo-inkythuatso-2-01-12-14-55-43.jpg"
+            src="/public/logo-thumnail.png"
             alt=""
           />
         </div>
@@ -254,13 +255,13 @@ const MeetingPage = () => {
                   <div className="absolute top-5 left-5 z-[20] flex items-center gap-3">
                     <img
                       className="w-12 h-12 rounded object-cover"
-                      src="https://images.unsplash.com/photo-1604904612715-47bf9d9bc670?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Nnx8dW5pZm9ybWV8ZW58MHx8MHx8&w=1000&q=80"
+                      src="https://www.isefpzak.xyz/img/team2.5b26df53.png"
                       alt="/"
                     />
                     <div className="text-white mb-auto h-full">
                       <span className="font-medium">Publisher</span>
                       <h2 className="text-white text-2xl leading-5 mb-0">
-                        Harry Kane
+                        Mr. Andrew
                       </h2>
                     </div>
                   </div>
