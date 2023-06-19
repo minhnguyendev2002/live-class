@@ -26,7 +26,7 @@ export default function StreamPlayer(props) {
             } else if (muteAudio === false && audioTrack) {
                 audioTrack.play()
                 console.log("================================", audioTrack);
-                // audioTrack.muted();
+                audioTrack.setVolume(0);
             }
         }
         //eslint-disable-next-line
