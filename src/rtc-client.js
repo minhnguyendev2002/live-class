@@ -56,7 +56,7 @@ export default class RTCClient {
         return new Promise((resolve, reject) => {
             // console.debug('startLive()')
 
-            AgoraRTC.createMicrophoneAndCameraTracks({microphoneId: microphoneId, AEC: true, ANS: true}, {cameraId: cameraId})
+            AgoraRTC.createMicrophoneAndCameraTracks({microphoneId: microphoneId, AEC: true}, {cameraId: cameraId})
                 .then((tracks) => {
                     this.mLocalAudioTrack = tracks[0]
                     this.mLocalVideoTrack = tracks[1]
